@@ -7,11 +7,17 @@ public enum MessageType {
   WRONG_INPUT
 }
 
+// Interface of login
 public interface ILogin: GLib.Object {
+  // username
   public abstract string name { get; }
+  // session name
   public abstract string session { get; }
+  // pass a prompt to the user from the server
   public abstract void show_prompt(PromptType type);
+  // pass a message to the user from the server
   public abstract void show_message(MessageType type);
+  // clean up aborted login process
   public abstract void abort();
 }
 

@@ -1,13 +1,22 @@
+// Interface of session
 public interface ISession: GLib.Object {
+  // Whether users should be hidden in the UI
   public abstract bool hide_users { get; }
+  // Whether the server has guest account
   public abstract bool has_guest_account { get; }
+  // Whether the server is locked
   public abstract bool locked { get; }
+  // The default session name
   public abstract string default_name { get; }
 
+  // Start login process
   public abstract void login(ILogin login, bool guest);
+  // Pass the respond to the server
   public abstract void respond(string message);
+  // Start the session
   public abstract void start();
 
+  // Emitted when user is successfully authenticated
   public signal void authenticated();
 }
 
