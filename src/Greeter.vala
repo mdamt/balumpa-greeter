@@ -8,7 +8,7 @@ public class Greeter: WebView {
     set_settings(settings);
 
     context_menu.connect(() => {
-      stdout.printf("Right click menu is disabled\n");
+      message("Right click menu is disabled");
       return true;
     });
 
