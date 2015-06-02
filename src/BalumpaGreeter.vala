@@ -1,10 +1,19 @@
 public class BalumpaGreeter: Gtk.Window {
   Greeter greeter;  
+  ISession session;
 
   public BalumpaGreeter() {
     greeter = new Greeter();
     add(greeter);
     show_all();
+
+    session = new BalumpaLightDM();
+    session.authenticated.connect(() => {
+      session.start();
+    });
+
+    var l = new Login(session);
+    session.login(l, false);
   }
 }
 
