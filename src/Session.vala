@@ -28,6 +28,7 @@ public class BalumpaLightDM: ISession, GLib.Object {
   bool awaiting_confirmation = false;
   bool awaiting_session = false;
 
+  // Props are mirrored from lightdm
   public bool hide_users {
     get {
       return greeter.hide_users_hint;
@@ -66,7 +67,7 @@ public class BalumpaLightDM: ISession, GLib.Object {
 
     greeter.show_message.connect(this.show_message);
     greeter.show_prompt.connect(this.show_prompt);
-    greeter.authentication_complete.connect(this.authentication_complete);
+    greeter.authentication_complete.connect(this.finalizing_authentication);
   }
   
   public void login(ILogin login, bool guest) {
@@ -119,7 +120,7 @@ public class BalumpaLightDM: ISession, GLib.Object {
     }
   }
 
-  void authentication_complete() {
+  void finalizing_authentication() {
     message("completing authentication");
     if (greeter.is_authenticated) {
       if (had_prompt) {
