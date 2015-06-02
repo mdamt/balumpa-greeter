@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Balumpa Greeter
+Comment=Balumpa Greeter
+Exec=balumpa-greeter
+Type=Application
+Name[en_US]=balumpa-greeter
