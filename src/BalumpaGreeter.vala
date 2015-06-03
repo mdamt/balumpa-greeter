@@ -13,9 +13,23 @@ public class BalumpaGreeter: Gtk.Window {
     session = new BalumpaLightDM();
     session.authenticated.connect(() => {
       session.start();
-    });
 
+    });
+    session.connected.connect(() => {
     var l = new Login(session);
+    var ul = new UserList(LightDM.UserList.get_instance());
+    warning("UL<%s>", ul.to_json());
+
+    ul.user_changed.connect((u) => {
+        warning("User %s changed", u.to_json());
+        });
+    ul.user_added.connect((u) => {
+        warning("User %s added", u.to_json());
+        });
+    ul.user_removed.connect((u) => {
+        warning("User %s removed", u.to_json());
+        });
+    });
   }
 }
 

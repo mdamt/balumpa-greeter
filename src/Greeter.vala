@@ -14,6 +14,10 @@ public class JSBridge: GLib.Object {
     var f = new JSCore.Object.function_with_callback (ctx, s, js_respond);  
     o.set_property (ctx, s, f, 0, null);  
 
+    s = new String.with_utf8_c_string ("userList");
+    f = new JSCore.Object.function_with_callback (ctx, s, js_user_list);  
+    o.set_property (ctx, s, f, 0, null);  
+
     var g_o = ctx.get_global_object ();
     s = new String.with_utf8_c_string ("BalumpaBackend");
     JSCore.Value v = g_o.get_property (ctx, s, null);
@@ -52,6 +56,27 @@ public class JSBridge: GLib.Object {
 
     return new JSCore.Value.boolean (ctx, result);
   }
+
+  public static JSCore.Value js_user_list (Context ctx,
+      JSCore.Object function,
+      JSCore.Object thisObject,
+      JSCore.Value[] arguments,
+      out JSCore.Value exception) {
+
+    exception = null;
+    JSCore.String? result = null;
+    // Get saved greeter from the object
+    Greeter? g = (Greeter) thisObject.get_private(); 
+    if (g != null) {
+      result = new JSCore.String.with_utf8_c_string(g.user_list_json());
+    } else {
+      warning("Greeter can't be found from JS");
+    }
+
+    return new JSCore.Value.string (ctx, result);
+  }
+
+
 
   static const JSCore.StaticFunction[] js_funcs = {
     { null, null, 0 }
@@ -107,15 +132,47 @@ public class JSBridge: GLib.Object {
     return r.to_boolean(context);
   }
 
+  public static void user_list_added (Context context, string user) {
+    var cmd = "window.BalumpaClient.userListAdded("+ user + ")";
+    var s = new String.with_utf8_c_string (cmd);
+    context.evaluate_script (s, null, null, 0, null); 
+  }
+
+  public static void user_list_removed (Context context, string user) {
+    var cmd = "window.BalumpaClient.userListRemoved("+ user + ")";
+    var s = new String.with_utf8_c_string (cmd);
+    context.evaluate_script (s, null, null, 0, null); 
+  }
+
+  public static void user_list_changed (Context context, string user) {
+    var cmd = "window.BalumpaClient.userListChanged("+ user + ")";
+    var s = new String.with_utf8_c_string (cmd);
+    context.evaluate_script (s, null, null, 0, null); 
+  }
+
+
+
 }
 
 public class Greeter: WebView {
+  UserList userList;
+
+  public string user_list_json() {
+    string r = userList.to_json();
+    return r;
+  }
+
   public Greeter() {
     var settings = new WebSettings();
     settings.enable_file_access_from_file_uris = true;
     settings.enable_universal_access_from_file_uris = true;
     settings.enable_java_applet = false;
     set_settings(settings);
+
+    userList = new UserList(LightDM.UserList.get_instance());
+    userList.user_changed.connect(user_list_changed);
+    userList.user_added.connect(user_list_added);
+    userList.user_removed.connect(user_list_removed);
 
     context_menu.connect(() => {
       message("Right click menu is disabled");
@@ -170,6 +227,33 @@ public class Greeter: WebView {
       warning("Context is not found");
     }
     return false;
+  }
+
+  void user_list_added(User u) {
+    unowned JSCore.GlobalContext? context = get_context();
+    if (context != null) {
+      JSBridge.user_list_added(context, u.to_json());
+    } else {
+      warning("Context is not found");
+    }
+  }
+
+  void user_list_removed(User u) {
+    unowned JSCore.GlobalContext? context = get_context();
+    if (context != null) {
+      JSBridge.user_list_removed(context, u.to_json());
+    } else {
+      warning("Context is not found");
+    }
+  }
+
+  void user_list_changed(User u) {
+    unowned JSCore.GlobalContext? context = get_context();
+    if (context != null) {
+      JSBridge.user_list_changed(context, u.to_json());
+    } else {
+      warning("Context is not found");
+    }
   }
 
   public void respond(string message) {
