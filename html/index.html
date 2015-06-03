@@ -5,8 +5,14 @@ var BalumpaClient = function() {
 
 BalumpaClient.prototype.show_prompt = function(type) {
   var b = new Balumpa();
-  console.log("--->" + b.respond("OK") + "ooo");
+  return b.respond("prompt OK");
 }
+
+BalumpaClient.prototype.show_message = function(type) {
+  var b = new Balumpa();
+  return b.respond("message OK");
+}
+
 
 var client = new BalumpaClient();
 window.BalumpaClient = client;

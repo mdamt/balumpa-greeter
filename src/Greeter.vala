@@ -91,12 +91,22 @@ public class JSBridge: GLib.Object {
     o.set_private(greeter);
   }
 
-  public static void show_prompt (Context context, PromptType type) {
+  public static bool show_prompt (Context context, PromptType type) {
     var type_str = ((int)type).to_string();
     var cmd = "window.BalumpaClient.show_prompt("+ type_str + ")";
     var s = new String.with_utf8_c_string (cmd);
     var r = context.evaluate_script (s, null, null, 0, null); 
+    return r.to_boolean(context);
   }
+
+  public static bool show_message (Context context, MessageType type) {
+    var type_str = ((int)type).to_string();
+    var cmd = "window.BalumpaClient.show_message("+ type_str + ")";
+    var s = new String.with_utf8_c_string (cmd);
+    var r = context.evaluate_script (s, null, null, 0, null); 
+    return r.to_boolean(context);
+  }
+
 }
 
 public class Greeter: WebView {
@@ -123,21 +133,38 @@ public class Greeter: WebView {
 
     document_load_finished.connect((frame) => {
       show_prompt(PromptType.PASSWORD);
+      show_message(MessageType.WRONG_INPUT);
     });
 
     load_uri("http://system/index.html");
 
   }
 
-  public void show_prompt(PromptType type) {
+  unowned JSCore.GlobalContext? get_context() {
     unowned WebFrame? frame = get_main_frame();
     if (frame == null) {
       warning("Frame is null");
-      return;
+      return null;
     }
     unowned JSCore.GlobalContext? context = (JSCore.GlobalContext) frame.get_global_context();
+    return context;
+  }
+
+  public void show_prompt(PromptType type) {
+    unowned JSCore.GlobalContext? context = get_context();
     if (context != null) {
-      JSBridge.show_prompt(context, type);
+      var r = JSBridge.show_prompt(context, type);
+      warning(">>%d", (int) r);
+    } else {
+      warning("Context is not found");
+    }
+  }
+
+  public void show_message(MessageType type) {
+    unowned JSCore.GlobalContext? context = get_context();
+    if (context != null) {
+      var r = JSBridge.show_message(context, type);
+      warning(">>%d", (int) r);
     } else {
       warning("Context is not found");
     }
@@ -151,6 +178,5 @@ public class Greeter: WebView {
     var uri = old.replace("http://system", "file://" + Constants.HTML_DIR + "/");
     return uri;
   }
-
 
 }
