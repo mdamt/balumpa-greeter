@@ -6,6 +6,9 @@ public class BalumpaGreeter: Gtk.Window {
     greeter = new Greeter();
     add(greeter);
     show_all();
+    var screen = Gdk.Screen.get_default();
+    resize(screen.width(), screen.height());
+    fullscreen();
 
     session = new BalumpaLightDM();
     session.authenticated.connect(() => {
@@ -13,7 +16,6 @@ public class BalumpaGreeter: Gtk.Window {
     });
 
     var l = new Login(session);
-    session.login(l, false);
   }
 }
 

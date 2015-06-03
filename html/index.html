@@ -1,0 +1,13 @@
+<h1>OK</h1>
+<script>
+var BalumpaClient = function() {
+}
+
+BalumpaClient.prototype.show_prompt = function(type) {
+  var b = new Balumpa();
+  console.log("--->" + b.respond("OK") + "ooo");
+}
+
+var client = new BalumpaClient();
+window.BalumpaClient = client;
+</script>
