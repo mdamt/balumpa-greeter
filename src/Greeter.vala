@@ -15,7 +15,7 @@ public class JSBridge: GLib.Object {
     o.set_property (ctx, s, f, 0, null);  
 
     var g_o = ctx.get_global_object ();
-    s = new String.with_utf8_c_string ("Balumpa");
+    s = new String.with_utf8_c_string ("BalumpaBackend");
     JSCore.Value v = g_o.get_property (ctx, s, null);
     JSCore.Object balumpa = v.to_object(ctx, null);
 
@@ -85,7 +85,7 @@ public class JSBridge: GLib.Object {
     var c = new Class (js_class);
     var o = new JSCore.Object (context, c, context);
     var g = context.get_global_object ();
-    var s = new String.with_utf8_c_string ("Balumpa");
+    var s = new String.with_utf8_c_string ("BalumpaBackend");
     g.set_property (context, s, o, PropertyAttribute.None, null);
     // Keep greeter in the object assigned to Balumpa
     o.set_private(greeter);
@@ -150,24 +150,26 @@ public class Greeter: WebView {
     return context;
   }
 
-  public void show_prompt(PromptType type) {
+  public bool show_prompt(PromptType type) {
     unowned JSCore.GlobalContext? context = get_context();
     if (context != null) {
       var r = JSBridge.show_prompt(context, type);
-      warning(">>%d", (int) r);
+      return r;
     } else {
       warning("Context is not found");
     }
+    return false;
   }
 
-  public void show_message(MessageType type) {
+  public bool show_message(MessageType type) {
     unowned JSCore.GlobalContext? context = get_context();
     if (context != null) {
       var r = JSBridge.show_message(context, type);
-      warning(">>%d", (int) r);
+      return r;
     } else {
       warning("Context is not found");
     }
+    return false;
   }
 
   public void respond(string message) {
