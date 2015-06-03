@@ -1,19 +1,42 @@
 <h1>OK</h1>
 <script>
-var BalumpaClient = function() {
+var BalumpaClient = function(impl) {
+  this.impl = impl;
 }
 
 BalumpaClient.prototype.show_prompt = function(type) {
-  var b = new Balumpa();
-  return b.respond("prompt OK");
+  if (this.impl && this.impl.show_prompt) {
+    return this.impl.show_prompt(type);
+  }
+  return false;
 }
 
 BalumpaClient.prototype.show_message = function(type) {
-  var b = new Balumpa();
+  if (this.impl && this.impl.show_message) {
+    return this.impl.show_message(type);
+  }
+  return false;
+}
+
+BalumpaClient.prototype.run = function() {
+  window.BalumpaClient = this;
+}
+
+var Balumpa = function() {
+}
+
+Balumpa.prototype.show_message = function(type) {
+  var b = new BalumpaBackend();
   return b.respond("message OK");
 }
 
 
-var client = new BalumpaClient();
-window.BalumpaClient = client;
+Balumpa.prototype.show_prompt = function(type) {
+  var b = new BalumpaBackend();
+  return b.respond("prompt OK");
+}
+
+
+var client = new BalumpaClient(new Balumpa());
+client.run();
 </script>
