@@ -18,6 +18,8 @@ public interface ISession: GLib.Object {
 
   // Emitted when user is successfully authenticated
   public signal void authenticated();
+  // Emitted when session is connected
+  public signal void connected();
 }
 
 public class BalumpaLightDM: ISession, GLib.Object {
@@ -60,6 +62,7 @@ public class BalumpaLightDM: ISession, GLib.Object {
       message("Connecting to lightdm");
       greeter.connect_to_daemon_sync();
       message("Connected to lightdm");
+      connected();
     } catch (Error r) {
       stderr.printf("Couldn't connect to lightdm");
       Posix.exit (Posix.EXIT_FAILURE);
